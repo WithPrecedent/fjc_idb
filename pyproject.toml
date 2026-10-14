@@ -6,7 +6,7 @@ description = "Makes using the FJC Integrated Database easier"
 authors = [{name = "Corey Rayburn Yung", email = "coreyrayburnyung@gmail.com"}]
 license = {text = "Apache Software License 2.0"}
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 version = "0.0.1"
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -14,16 +14,16 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14"]
 keywords = []
-dependencies = []
+dependencies = [
+    "camina",
+    "pandas>=3.0.0",]
 
 [project.optional-dependencies]
-
 
 [project.urls]
 Documentation = "https://WithPrecedent.github.io/fjc_idb"
@@ -35,7 +35,6 @@ Changelog = "https://WithPrecedent.github.io/fjc_idb/changelog"
 [dependency-groups]
 dev = [
     "uv",
-    
     "markdown-callouts",
     "markdown-exec",
     "mkdocs",
@@ -52,7 +51,6 @@ dev = [
     "ruff",
     {include-group = "tests"}]
 tests = [
-    
     "pytest",
     "pytest-cov",
     "pytest-randomly",
@@ -65,8 +63,6 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/fjc_idb"]
 
-
-
 [tool.mypy]
 files = ['src']
 disallow_untyped_defs = true
@@ -76,7 +72,6 @@ check_untyped_defs = true
 warn_return_any = true
 warn_unused_ignores = true
 show_error_codes = true
-
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
