@@ -142,7 +142,6 @@ appellate_columns: dict[str, Column] = {
     'in_forma_pauperis_termination': Column(
         'TRMFEE', 'in_forma_pauperis_termination', str, missing_value = None,
         decoder = rules.in_forma_pauperis)}
-"""Columns in the FJC IDB appellate files, keyed by their parsed names."""
 
 civil_columns: dict[str, Column] = {
     'circuit': Column('CIRCUIT', 'circuit', str, decoder = rules.circuits),
@@ -227,8 +226,6 @@ civil_columns: dict[str, Column] = {
         decoder = rules.civil_in_forma_pauperis),
     'pending': Column('STATUSCD', 'pending', int, decoder = rules.pending),
     'data_file_year': Column('TAPEYEAR', 'data_file_year', int)}
-"""Columns in the FJC IDB civil files, keyed by their parsed names."""
-
 
 def _offense_columns(stage: str, number: int) -> dict[str, Column]:
     """Returns the columns describing one of the five offenses of a defendant.
@@ -253,7 +250,6 @@ def _offense_columns(stage: str, number: int) -> dict[str, Column]:
         Column(f'{prefix}SEV{number}', f'{stage}_severity_{number}', str)]
     return {spec.name: spec for spec in specs}
 
-
 def _sentence_columns(number: int) -> dict[str, Column]:
     """Returns the columns describing the outcome of one offense at termination.
 
@@ -276,7 +272,6 @@ def _sentence_columns(number: int) -> dict[str, Column]:
             f'SUPVREL{number}', f'supervised_release_months_{number}', int),
         Column(f'FINEAMT{number}', f'fine_{number}', int)]
     return {spec.name: spec for spec in specs}
-
 
 criminal_columns: dict[str, Column] = {
     'fiscal_year': Column('FISCALYR', 'fiscal_year', int),
@@ -390,4 +385,3 @@ criminal_columns: dict[str, Column] = {
         'LOADDATE', 'load_date', 'date',
         missing_value = options._MISSING_DATE, missing_replacement = 'NA'),
     'data_file_year': Column('TAPEYEAR', 'data_file_year', int)}
-"""Columns in the FJC IDB criminal files, keyed by their parsed names."""

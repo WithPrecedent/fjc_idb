@@ -5,7 +5,7 @@ from __future__ import annotations
 from .downloader import download, list_files
 from .main import run
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 __author__: str = 'Corey Rayburn Yung'
 
