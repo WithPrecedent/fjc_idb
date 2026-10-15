@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 """ Criminal District Rules """
 
 case_types: dict[str, str] = {

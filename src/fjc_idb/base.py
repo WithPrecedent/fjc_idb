@@ -1,3 +1,11 @@
+"""Column specifications for each type of FJC IDB file.
+
+Each case type has a dictionary of `Column` instances, keyed by the name each
+column has after parsing. The specifications say how to clean, decode, type,
+and rename every column in the original files.
+
+"""
+
 from __future__ import annotations
 
 import dataclasses
@@ -8,7 +16,7 @@ from . import options, rules
 
 @dataclasses.dataclass
 class Column:
-    """A dataclass representing a Column in the FJC IDB dataset.
+    """A column in an FJC IDB file and how to parse it.
 
     Attributes:
         import_name: The column name in the FJC IDB files.
@@ -18,7 +26,18 @@ class Column:
             the FJC IDB files, or None if no code marks missing data.
         missing_replacement: The value written in place of missing data when
             the data is exported.
-        decoder: Labels that replace the codes in the column.
+        decoder: Labels that replace the codes in the column, keyed by code.
+            Codes without a label are kept as they are.
+
+    Examples:
+        A text column whose codes are replaced with circuit names, and a date
+        column whose missing dates are written as 'NA':
+
+            Column('CIRCUIT', 'circuit', str, decoder = rules.circuits)
+            Column(
+                'DKTDATE', 'docket_date', 'date',
+                missing_value = options._MISSING_DATE,
+                missing_replacement = 'NA')
 
     """
 
@@ -123,6 +142,7 @@ appellate_columns: dict[str, Column] = {
     'in_forma_pauperis_termination': Column(
         'TRMFEE', 'in_forma_pauperis_termination', str, missing_value = None,
         decoder = rules.in_forma_pauperis),}
+"""Columns in the FJC IDB appellate files, keyed by their parsed names."""
 
 civil_columns: dict[str, Column] = {
     'circuit': Column('CIRCUIT', 'circuit', str, decoder = rules.circuits),
@@ -207,6 +227,7 @@ civil_columns: dict[str, Column] = {
         decoder = rules.civil_in_forma_pauperis),
     'pending': Column('STATUSCD', 'pending', int, decoder = rules.pending),
     'data_file_year': Column('TAPEYEAR', 'data_file_year', int)}
+"""Columns in the FJC IDB civil files, keyed by their parsed names."""
 
 
 def _offense_columns(stage: str, number: int) -> dict[str, Column]:
@@ -369,3 +390,4 @@ criminal_columns: dict[str, Column] = {
         'LOADDATE', 'load_date', 'date',
         missing_value = options._MISSING_DATE, missing_replacement = 'NA'),
     'data_file_year': Column('TAPEYEAR', 'data_file_year', int)}
+"""Columns in the FJC IDB criminal files, keyed by their parsed names."""

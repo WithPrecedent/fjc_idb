@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 """ Opinion Rules """
 
 published_codes: list[int] = [2, 4, 6]

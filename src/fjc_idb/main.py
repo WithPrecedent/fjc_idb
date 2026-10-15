@@ -1,4 +1,20 @@
-"""Imports, parses, and exports data from the FJC Integrated Database."""
+"""Imports, parses, and exports data from the FJC Integrated Database.
+
+The FJC distributes the Integrated Database (IDB) as yearly SAS files. The
+functions in this module turn those files into one clean table per case type:
+
+- `import_data` reads the yearly files for a range of years and drops the
+  outdated pending cases repeated in earlier files.
+- `parse_data` converts missing-value codes to missing data, replaces codes
+  with readable labels, converts each column to its data type, adds derived
+  columns, and renames the columns.
+- `export_data` writes a parsed table to a CSV file.
+- `run` does all three for a range of years, one yearly file at a time.
+
+The case types are 'appellate' (courts of appeals), 'civil' (district court
+civil cases), and 'criminal' (district court criminal defendants).
+
+"""
 
 from __future__ import annotations
 
@@ -21,6 +37,11 @@ def run(
     fix_city_spellings: bool = options._FIX_CITY_SPELLINGS) -> None:
     """Imports, parses, and exports FJC IDB data for a range of years.
 
+    The CSV file is named 'fjc_idb_{case_type}_data_{start_year}_{stop_year}'
+    and saved next to the yearly files for `case_type`. Each yearly file is
+    parsed and appended to the CSV file in turn, so only one year of data is
+    held in memory at a time.
+
     Args:
         case_type: The source type ('appellate', 'civil', or 'criminal').
         start_year: The first statistical year to include.
@@ -33,16 +54,18 @@ def run(
         fix_city_spellings: Whether to correct misspelled city names from the
             FJC codebook. Defaults to options._FIX_CITY_SPELLINGS.
 
-    Each yearly file is parsed and appended to the CSV file in turn, so only
-    one year of data is held in memory at a time.
-
     Raises:
         ValueError: If `case_type` is not a recognized source type.
+        FileNotFoundError: If no yearly files are found for the years.
+
+    Examples:
+        >>> import fjc_idb
+        >>> fjc_idb.run('appellate', 2008, 2026)  # doctest: +SKIP
 
     """
     if case_type not in options._SOURCE_PREFIXES:
         message = (
-            f'Invalid source type: {case_type}.'
+            f'Invalid source type: {case_type}. '
             f'Must be one of {list(options._SOURCE_PREFIXES)}.')
         raise ValueError(message)
     stop_year = stop_year or datetime.datetime.now().year
@@ -67,6 +90,9 @@ def export_data(
     missing_replacements: dict[str, Any] | None = None,
     append: bool = False) -> None:
     """Exports the FJC IDB dataset to a CSV file.
+
+    Dates are written as YYYY-MM-DD. Missing data is written as the value in
+    `missing_replacements` for its column, or left blank.
 
     Args:
         data: The FJC IDB dataset to export.
@@ -97,9 +123,14 @@ def import_data(
     data_folder: pathlib.Path = options._DATA_FOLDER) -> pd.DataFrame:
     """Imports the FJC IDB dataset from the specified folder.
 
-    Each yearly file holds the cases terminated in that statistical year. Recent
-    files also hold a snapshot of the cases still pending when the file was
-    made, so only the pending cases in the latest file are kept.
+    Each yearly file holds the cases (or, for criminal data, the defendants)
+    terminated in that statistical year, and many files also hold a snapshot of
+    those still pending when the file was made. Because pending records are
+    repeated in every later file until they end, only the pending records in
+    the latest file are kept.
+
+    The whole range is held in memory. For a long range of civil or criminal
+    data, `run` processes one year at a time instead.
 
     Args:
         case_type: The source type ('appellate', 'civil', or 'criminal').
@@ -131,7 +162,9 @@ def parse_data(
 
     Missing-value codes are converted to missing data, coded columns with a
     decoder are replaced by their labels, every column is converted to its
-    data type, and the days between key dates are added.
+    data type, and the days between key dates are added. Each case type also
+    gets derived columns, such as indicators for groups of offenses or natures
+    of suit; the codebooks in the User Guide list them.
 
     Args:
         data: The imported FJC IDB dataset.
@@ -171,13 +204,26 @@ def parse_data(
     return data
 
 def parse_docket_number(docket_number: str) -> str:
-    """Parse a docket number into its components and unite into a string.
+    """Converts an IDB court of appeals docket number to its standard form.
+
+    The IDB stores appellate docket numbers as a two-digit year followed by a
+    serial number, with a 0 inserted before four-digit serial numbers (for
+    example, '1701234' for 17-1234). The inserted 0 is removed.
 
     Args:
-        docket_number: The docket number to parse.
+        docket_number: The docket number as it appears in the IDB.
 
     Returns:
-        string of hyphenated docket number in standard form.
+        str: The docket number in the form 'No. YY-NNNN'.
+
+    Raises:
+        ValueError: If `docket_number` has fewer than six characters.
+
+    Examples:
+        >>> parse_docket_number('1701234')
+        'No. 17-1234'
+        >>> parse_docket_number('1910001')
+        'No. 19-10001'
 
     """
     if len(docket_number) < 6:

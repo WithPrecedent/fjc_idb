@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 """ Criminal Offense Rules """
 
 criminal_homicide: list[str] = [

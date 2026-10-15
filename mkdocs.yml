@@ -15,6 +15,9 @@ watch: [
   src/fjc_idb]
 copyright: Copyright, 2026 Corey Rayburn Yung
 docs_dir: docs
+# Files included in other pages rather than published on their own.
+exclude_docs: |
+  codebooks/includes/
 
 # Documentation Structure
 
@@ -27,6 +30,9 @@ nav:
   - Tutorial: tutorial.md
   - Advanced User Guide: advanced.md
   - Recipes: recipes.md
+  - Appellate Codebook: codebooks/appellate.md
+  - Criminal District Codebook: codebooks/criminal.md
+  - Civil District Codebook: codebooks/civil.md
 - API: reference/
 - Development:
   - Contributing: contributing.md

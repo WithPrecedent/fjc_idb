@@ -5,6 +5,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
+from fjc_idb import __main__ as cli
 from fjc_idb import options
 from fjc_idb.main import (
     _add_pro_se_party,
@@ -304,6 +305,43 @@ def test_export_data(tmp_path) -> None:
         'Central District of California',
         '',
     ]
+
+
+def test_command_line(monkeypatch) -> None:
+    calls = []
+    monkeypatch.setattr(
+        cli.idb, 'run', lambda *args, **kwargs: calls.append((args, kwargs)))
+    cli.main(
+        ['civil', 'civil', '--start-year', '2010', '--rename-columns', 'false'])
+    assert calls == [
+        (
+            ('civil', 2010, None),
+            {
+                'data_folder': options._DATA_FOLDER,
+                'rename_columns': False,
+                'fix_city_spellings': options._FIX_CITY_SPELLINGS,
+            },
+        )
+    ]
+    calls.clear()
+    cli.main(['all', '--start-year', '2008', '--stop-year', '2009'])
+    assert [args for args, _ in calls] == [
+        ('appellate', 2008, 2009),
+        ('civil', 2008, 2009),
+        ('criminal', 2008, 2009),
+    ]
+    calls.clear()
+    cli.main([
+        'appellate', '--start-year', '2008', '--rename-columns',
+        '--fix-city-spellings', 'No'])
+    assert calls[0][1]['rename_columns'] is True
+    assert calls[0][1]['fix_city_spellings'] is False
+    with pytest.raises(SystemExit):
+        cli.main(['appellate', '--start-year', '2008', '--rename-columns', 'x'])
+    with pytest.raises(SystemExit):
+        cli.main(['bankruptcy', '--start-year', '2008'])
+    with pytest.raises(SystemExit):
+        cli.main(['appellate'])
 
 
 def test_import_data() -> None:

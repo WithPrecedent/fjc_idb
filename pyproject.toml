@@ -23,6 +23,9 @@ dependencies = [
     "camina",
     "pandas>=3.0.0",]
 
+[project.scripts]
+fjc-idb = "fjc_idb.__main__:main"
+
 [project.optional-dependencies]
 
 [project.urls]

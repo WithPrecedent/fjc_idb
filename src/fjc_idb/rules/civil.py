@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 """ Civil Litigation Rules """
 
 civil_civil_rights: list[str] = [
