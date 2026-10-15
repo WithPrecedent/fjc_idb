@@ -16,7 +16,7 @@ type, in the layout that `run` expects:
 
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import html.parser
 import logging
 import pathlib
@@ -41,6 +41,7 @@ def download(
     start_year: int,
     stop_year: int | None = None,
     data_folder: str | pathlib.Path = options._DATA_FOLDER,
+    *,
     overwrite: bool = False,
     codebook: bool = True) -> list[pathlib.Path]:
     """Downloads the yearly FJC IDB files for a range of years.
@@ -80,7 +81,7 @@ def download(
             f'Invalid source type: {case_type}. '
             f'Must be one of {list(options._DATASET_PAGES)}.')
         raise ValueError(message)
-    stop_year = stop_year or datetime.datetime.now().year
+    stop_year = stop_year or dt.datetime.now(tz = dt.UTC).year
     root = camina.pathlibify(data_folder)
     folder = main._get_data_path(case_type, root)
     links = _get_links(options._DATASET_PAGES[case_type])
@@ -217,9 +218,17 @@ def _open(url: str) -> Any:
     Returns:
         Any: The response to the request.
 
+    Raises:
+        ValueError: If `url` is not an https address.
+
     """
-    request = urllib.request.Request(url, headers = {'User-Agent': _USER_AGENT})
-    return urllib.request.urlopen(request, timeout = options._DOWNLOAD_TIMEOUT)
+    if urllib.parse.urlparse(url).scheme != 'https':
+        message = f'Only https addresses can be downloaded, not {url}.'
+        raise ValueError(message)
+    request = urllib.request.Request(  # noqa: S310
+        url, headers = {'User-Agent': _USER_AGENT})
+    return urllib.request.urlopen(  # noqa: S310
+        request, timeout = options._DOWNLOAD_TIMEOUT)
 
 
 def _save(url: str, folder: pathlib.Path) -> pathlib.Path:

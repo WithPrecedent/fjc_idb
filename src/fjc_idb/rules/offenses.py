@@ -72,12 +72,12 @@ criminal_forgery_counterfeit: list[str] = ['5600', '5710', '5720', '5800']
 criminal_money_laundering: list[str] = ['7477']
 criminal_sex_abuse: list[str] = ['6100', '6110', '6200']
 criminal_sex_offenses: list[str] = [
-    '6100', 
+    '6100',
     '6110',
-    '6200', 
-    '6300', 
-    '7470', 
-    '9810', 
+    '6200',
+    '6300',
+    '7470',
+    '9810',
     '9820']
 criminal_marijuana: list[str] = ['6500', '6501', '6502', '6503', '6504', '6505']
 criminal_drugs: list[str] = [
@@ -127,10 +127,10 @@ criminal_kidnapping: list[str] = ['7600', '7601', '7610', '7611']
 criminal_firearms: list[str] = ['7800', '7820', '7830', '7831']
 criminal_immigration: list[str] = ['8710', '8720', '8730', '8740', '8750']
 criminal_terrorism_and_espionage: list[str] = [
-    '9751', 
-    '9752', 
-    '9753', 
-    '9754', 
+    '9751',
+    '9752',
+    '9753',
+    '9754',
     '9957']
 # New columns marking the OFFENSE codes in each list.
 criminal_offense_columns: dict[str, list[str]] = {

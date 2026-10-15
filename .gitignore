@@ -79,8 +79,7 @@ target/
 profile_default/
 ipython_config.py
 
-# pyenv
-.python-version
+# pyenv (.python-version is kept in the repository to pin Python 3.11)
 
 # pipenv
 Pipfile.lock

@@ -18,7 +18,7 @@ civil cases), and 'criminal' (district court criminal defendants).
 
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import pathlib
 from typing import Any
 
@@ -27,12 +27,17 @@ import pandas as pd
 
 from . import base, options, rules
 
+# Docket numbers have a two-digit year and a serial number of four or more
+# digits, with a 0 inserted before four-digit serial numbers.
+_DOCKET_MINIMUM_LENGTH = 6
+_SERIAL_DIGITS = 4
 
 def run(
     case_type: str,
     start_year: int,
     stop_year: int | None = None,
     data_folder: str | pathlib.Path = options._DATA_FOLDER,
+    *,
     rename_columns: bool = options._RENAME_COLUMNS,
     fix_city_spellings: bool = options._FIX_CITY_SPELLINGS) -> None:
     """Imports, parses, and exports FJC IDB data for a range of years.
@@ -45,18 +50,17 @@ def run(
     Args:
         case_type: The source type ('appellate', 'civil', or 'criminal').
         start_year: The first statistical year to include.
-        stop_year: The last statistical year to include. Defaults to None, in 
+        stop_year: The last statistical year to include. Defaults to None, in
             which case the current year is used.
-        data_folder: The path to the folder containing the FJC IDB dataset. 
+        data_folder: The path to the folder containing the FJC IDB dataset.
             Defaults to options._DATA_FOLDER.
-        rename_columns: Whether to rename columns based on the column mapping 
+        rename_columns: Whether to rename columns based on the column mapping
             for `case_type`. Defaults to options._RENAME_COLUMNS.
         fix_city_spellings: Whether to correct misspelled city names from the
             FJC codebook. Defaults to options._FIX_CITY_SPELLINGS.
 
     Raises:
         ValueError: If `case_type` is not a recognized source type.
-        FileNotFoundError: If no yearly files are found for the years.
 
     Examples:
         >>> import fjc_idb
@@ -68,7 +72,7 @@ def run(
             f'Invalid source type: {case_type}. '
             f'Must be one of {list(options._SOURCE_PREFIXES)}.')
         raise ValueError(message)
-    stop_year = stop_year or datetime.datetime.now().year
+    stop_year = stop_year or dt.datetime.now(tz = dt.UTC).year
     data_folder = _get_data_path(case_type, data_folder)
     files = _get_files(case_type, start_year, stop_year, data_folder)
     missing_replacements = {
@@ -78,7 +82,9 @@ def run(
     file_name = f'fjc_idb_{case_type}_data_{start_year}_{stop_year}.csv'
     for index, file in enumerate(files):
         data = _import_file(file, keep_pending = index == len(files) - 1)
-        data = parse_data(data, case_type, rename_columns, fix_city_spellings)
+        data = parse_data(
+            data, case_type, rename_columns = rename_columns,
+            fix_city_spellings = fix_city_spellings)
         export_data(
             data, data_folder, file_name, missing_replacements,
             append = index > 0)
@@ -88,6 +94,7 @@ def export_data(
     data_folder: pathlib.Path,
     file_name: str,
     missing_replacements: dict[str, Any] | None = None,
+    *,
     append: bool = False) -> None:
     """Exports the FJC IDB dataset to a CSV file.
 
@@ -143,9 +150,6 @@ def import_data(
     Returns:
         pd.DataFrame: The imported rows from all matching yearly files.
 
-    Raises:
-        FileNotFoundError: If no yearly files are found in `data_folder`.
-
     """
     files = _get_files(case_type, start_year, stop_year, data_folder)
     dataframes = [
@@ -169,7 +173,7 @@ def parse_data(
     Args:
         data: The imported FJC IDB dataset.
         case_type: The source type ('appellate', 'civil', or 'criminal').
-        rename_columns: Whether to rename columns based on the column mapping 
+        rename_columns: Whether to rename columns based on the column mapping
             for `case_type`.
         fix_city_spellings: Whether to correct misspelled city names from the
             FJC codebook.
@@ -226,11 +230,11 @@ def parse_docket_number(docket_number: str) -> str:
         'No. 19-10001'
 
     """
-    if len(docket_number) < 6:
+    if len(docket_number) < _DOCKET_MINIMUM_LENGTH:
         raise ValueError(f'Invalid docket number: {docket_number}')
     year = docket_number[:2]
     docket_num = docket_number[2:]
-    if len(docket_num) > 4 and docket_num[0] == '0':
+    if len(docket_num) > _SERIAL_DIGITS and docket_num[0] == '0':
         docket_num = docket_num[1:]
     return f'No. {year}-{docket_num}'
 
@@ -275,7 +279,7 @@ def _add_appeal_type_columns(
     if source not in data:
         return data
     appeal_types = _to_codes(data[source])
-    position = data.columns.get_loc(source) + 1
+    position = _position_after(data, source)
     others = rules.appeal_types_in_other_columns
     for code, name in rules.appeal_types_to_columns.items():
         included = [code] + [
@@ -312,7 +316,7 @@ def _add_code_columns(
         return data
     codes = pd.concat([_to_codes(data[source]) for source in sources], axis = 1)
     missing = (codes.isna() | codes.isin(options._MISSING_CODES)).all(axis = 1)
-    position = data.columns.get_loc(sources[-1]) + 1
+    position = _position_after(data, sources[-1])
     for name, included in columns.items():
         indicator = codes.isin(included).any(axis = 1).astype('Int64')
         data.insert(position, f'{name}{suffix}', indicator.mask(missing))
@@ -339,7 +343,7 @@ def _add_date_gaps(data: pd.DataFrame) -> pd.DataFrame:
     if not gaps:
         return data
     dates = {date for pair in gaps.values() for date in pair}
-    position = max(data.columns.get_loc(date) for date in dates) + 1
+    position = max(_position_after(data, date) for date in dates)
     for name, (start, end) in gaps.items():
         days = (data[end] - data[start]).dt.days.astype('Int64')
         data.insert(position, name, days)
@@ -366,7 +370,7 @@ def _add_separate_opinions(data: pd.DataFrame) -> pd.DataFrame:
         return data
     codes = pd.concat([_to_codes(data[source]) for source in sources], axis = 1)
     missing = (codes.isna() | codes.isin(options._MISSING_CODES)).all(axis = 1)
-    position = data.columns.get_loc('JDG3INV') + 1
+    position = _position_after(data, 'JDG3INV')
     for name, included in (
             ('concurrences', rules.concurrence_codes),
             ('dissents', rules.dissent_codes)):
@@ -398,7 +402,7 @@ def _add_published(data: pd.DataFrame) -> pd.DataFrame:
         codes.isin([str(code) for code in rules.unpublished_codes]), 0)
     published = published.mask(
         codes.isin([str(code) for code in rules.published_codes]), 1)
-    data.insert(data.columns.get_loc('PUBSTAT') + 1, 'published', published)
+    data.insert(_position_after(data, 'PUBSTAT'), 'published', published)
     return data
 
 
@@ -429,7 +433,7 @@ def _add_pro_se_party(
     pro_se_party = pro_se_party.mask(
         codes.isin(rules.pro_se_codes).any(axis = 1), 1)
     data.insert(
-        data.columns.get_loc(sources[-1]) + 1, 'pro_se_party', pro_se_party)
+        _position_after(data, sources[-1]), 'pro_se_party', pro_se_party)
     return data
 
 def _combine_court_codes(
@@ -495,7 +499,7 @@ def _drop_stale_pending(dataframes: list[pd.DataFrame]) -> list[pd.DataFrame]:
     return [*earlier, dataframes[-1]]
 
 def _get_data_path(
-    case_type: str, 
+    case_type: str,
     data_folder: pathlib.Path | str) -> pathlib.Path:
     """Returns the path to the data file for the specified source type.
 
@@ -507,12 +511,10 @@ def _get_data_path(
         pathlib.Path: The path to the data file for the specified source type.
 
     """
-    data_folder = camina.pathlibify(data_folder)
+    folder: pathlib.Path = camina.pathlibify(data_folder)
     if case_type in ['civil', 'criminal']:
-        data_folder = data_folder / 'district' / case_type
-    else:
-        data_folder = data_folder / case_type
-    return data_folder
+        return folder / 'district' / case_type
+    return folder / case_type
 
 def _get_files(
     case_type: str,
@@ -537,7 +539,7 @@ def _get_files(
 
     """
     prefix = options._SOURCE_PREFIXES[case_type]
-    stop_year = stop_year or datetime.datetime.now().year
+    stop_year = stop_year or dt.datetime.now(tz = dt.UTC).year
     files = []
     for year in range(start_year, stop_year + 1):
         year_suffix = f'{year % 100:02d}'
@@ -581,10 +583,11 @@ def _get_columns(case_type: str) -> dict[str, base.Column]:
 
     """
     try:
-        return getattr(base, f'{case_type}_columns')
+        columns: dict[str, base.Column] = getattr(base, f'{case_type}_columns')
     except AttributeError as error:
         message = f'No column mapping exists for {case_type} cases.'
         raise NotImplementedError(message) from error
+    return columns
 
 def _parse_column(column: pd.Series, spec: base.Column) -> pd.Series:
     """Cleans, decodes, and converts a column based on its specification.
@@ -646,7 +649,28 @@ def _parse_jurisdiction(data: pd.DataFrame) -> pd.DataFrame:
     jurisdiction = jurisdiction.mask(jurisdiction == '-9', 'Non-Civil Case')
     data['JURIS'] = jurisdiction
     return data
-    
+
+def _position_after(data: pd.DataFrame, column: str) -> int:
+    """Returns the position just after a column.
+
+    Args:
+        data: The dataset.
+        column: The name of the column.
+
+    Returns:
+        int: The position just after `column`.
+
+    Raises:
+        TypeError: If `column` appears more than once in `data`.
+
+    """
+    location = data.columns.get_loc(column)
+    if not isinstance(location, int):
+        message = f'The column {column} appears more than once.'
+        raise TypeError(message)
+    return location + 1
+
+
 def _prepare_appellate(data: pd.DataFrame) -> pd.DataFrame:
     """Makes the changes that are specific to appellate data.
 
@@ -674,7 +698,7 @@ def _prepare_appellate(data: pd.DataFrame) -> pd.DataFrame:
     data = _add_code_columns(data, 'OFFENSE', rules.criminal_offense_columns)
     data = _add_code_columns(data, 'NOS', rules.civil_nature_of_suit_columns)
     dockets = data['DOCKET'].map(parse_docket_number)
-    data.insert(data.columns.get_loc('DOCKET') + 1, 'docket_number', dockets)
+    data.insert(_position_after(data, 'DOCKET'), 'docket_number', dockets)
     return _combine_court_codes(data, 'DCIRC', 'DDIST', ['DOFFICE'])
 
 

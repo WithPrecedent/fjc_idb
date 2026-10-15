@@ -18,10 +18,11 @@ from . import main as idb
 from . import options
 from .downloader import download as download_files
 
+logger = logging.getLogger(__name__)
+
 
 def main(arguments: Sequence[str] | None = None) -> None:
-    """Downloads and exports FJC IDB data for the case types and years given
-    on the command line.
+    """Downloads and exports FJC IDB data as the command line arguments say.
 
     Args:
         arguments: The command line arguments. Defaults to None, in which case
@@ -42,9 +43,9 @@ def main(arguments: Sequence[str] | None = None) -> None:
                 parsed.stop_year,
                 data_folder = parsed.data_folder,
                 overwrite = parsed.overwrite)
-            print(
-                f'Downloaded {len(files)} {case_type} files in '
-                f'{time.time() - started:.0f}s.')
+            logger.info(
+                'Downloaded %s %s files in %.0fs.',
+                len(files), case_type, time.time() - started)
         if parsed.download_only:
             continue
         started = time.time()
@@ -55,7 +56,8 @@ def main(arguments: Sequence[str] | None = None) -> None:
             data_folder = parsed.data_folder,
             rename_columns = parsed.rename_columns,
             fix_city_spellings = parsed.fix_city_spellings)
-        print(f'Exported {case_type} data in {time.time() - started:.0f}s.')
+        logger.info(
+            'Exported %s data in %.0fs.', case_type, time.time() - started)
 
 
 def _get_parser() -> argparse.ArgumentParser:

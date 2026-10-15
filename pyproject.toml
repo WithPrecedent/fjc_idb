@@ -52,7 +52,9 @@ dev = [
     "mypy",
     "pre-commit",
     "ruff",
-    {include-group = "tests"}]
+    "pandas-stubs>=3.0.5.260914",
+    {include-group = "tests"},
+]
 tests = [
     "pytest",
     "pytest-cov",
@@ -75,6 +77,11 @@ check_untyped_defs = true
 warn_return_any = true
 warn_unused_ignores = true
 show_error_codes = true
+
+# camina does not ship type information.
+[[tool.mypy.overrides]]
+module = ['camina']
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

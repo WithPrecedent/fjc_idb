@@ -37,7 +37,7 @@
   describe every column of the CSV files and how it relates to the IDB.
 
 The IDB is the most complete public source of case-level data on the federal
-courts, but it is distributed as one SAS file per year with confusing field 
+courts, but it is distributed as one SAS file per year with confusing field
 names and a messy coding system. This repo addresses those shortcomings. But
 it cannot cure the issue of missing data (particularly judge names). However,
 the improvements made here should make it easier to merge the IDB data with

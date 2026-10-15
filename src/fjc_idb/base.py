@@ -141,7 +141,7 @@ appellate_columns: dict[str, Column] = {
         'TORPROCSUB', 'writ_termination', str, decoder = rules.writs),
     'in_forma_pauperis_termination': Column(
         'TRMFEE', 'in_forma_pauperis_termination', str, missing_value = None,
-        decoder = rules.in_forma_pauperis),}
+        decoder = rules.in_forma_pauperis)}
 """Columns in the FJC IDB appellate files, keyed by their parsed names."""
 
 civil_columns: dict[str, Column] = {
