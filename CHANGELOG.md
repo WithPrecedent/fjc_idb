@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 <!-- insertion marker -->
 
+## 0.0.3
+
+### Added
+
+- `merge_district` (and the `--merge-district` option) merges the appellate
+  data with the civil and criminal district records of the appealed cases and
+  saves the result as
+  `fjc_idb_appellate_with_district_data_{start_year}_{stop_year}.csv`. Appeals
+  are matched by district, docket number, and, for criminal cases, defendant
+  number, and the district columns are added with the prefix `district_`.
+- `create_folders` creates the folders of the data folder, and downloading now
+  creates any that are missing.
+
+### Changed
+
+- The documentation refers to the package by its PyPI name, `fjc-idb`, when
+  installing it and in prose; it is still imported as `fjc_idb`.
+
 ## 0.0.2
 
 ### Added
