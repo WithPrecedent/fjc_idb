@@ -3,7 +3,8 @@
 The FJC publishes each yearly file of the Integrated Database on a dataset page
 for its case type (see `options._DATASET_PAGES`). The functions in this module
 read those pages and save the yearly SAS files, and the codebook for each case
-type, in the layout that `run` expects:
+type, in the layout that `run` expects, creating any folders that do not exist
+yet:
 
     data_folder/
     ├── appellate/          ap08.sas7bdat, ...
@@ -51,7 +52,8 @@ def download(
     skipped unless `overwrite` is True, in which case its file is replaced. The
     FJC updates the file for the current year during the year, so overwrite it
     to get the latest data. Years the FJC has not published are skipped with a
-    warning.
+    warning. Any folders of the data folder that do not exist yet are created
+    (see `create_folders`).
 
     Args:
         case_type: The source type ('appellate', 'civil', or 'criminal').
@@ -83,6 +85,7 @@ def download(
         raise ValueError(message)
     stop_year = stop_year or dt.datetime.now(tz = dt.UTC).year
     root = camina.pathlibify(data_folder)
+    create_folders(root)
     folder = main._get_data_path(case_type, root)
     links = _get_links(options._DATASET_PAGES[case_type])
     files = _get_yearly_files(links)
@@ -110,6 +113,37 @@ def download(
             if overwrite or not path.exists():
                 downloaded.append(_save(url, path.parent))
     return downloaded
+
+
+def create_folders(
+    data_folder: str | pathlib.Path = options._DATA_FOLDER,
+) -> list[pathlib.Path]:
+    """Creates the folders of the data folder that do not exist yet.
+
+    The data folder gets a folder for the yearly files of each case type and a
+    'docs' folder for the codebooks. Folders that already exist, and the files
+    in them, are left as they are.
+
+    Args:
+        data_folder: The path to the folder containing the FJC IDB dataset.
+            Defaults to options._DATA_FOLDER.
+
+    Returns:
+        list[pathlib.Path]: The folders of the data folder.
+
+    Examples:
+        >>> import fjc_idb
+        >>> fjc_idb.create_folders('path/to/fjc_idb')  # doctest: +SKIP
+
+    """
+    root = camina.pathlibify(data_folder)
+    folders = [
+        *(main._get_data_path(case_type, root)
+          for case_type in options._DATASET_PAGES),
+        root / 'docs']
+    for folder in folders:
+        folder.mkdir(parents = True, exist_ok = True)
+    return folders
 
 
 def list_files(case_type: str) -> dict[int, str]:

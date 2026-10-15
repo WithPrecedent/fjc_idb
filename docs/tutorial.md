@@ -40,7 +40,10 @@ fjc_idb/                  <- the data folder
 
 Pass the location of this folder with `--data-folder` (or `data_folder` in
 Python), or set it once as the default in `options.py` (see the
-[Advanced User Guide](advanced.md)).
+[Advanced User Guide](advanced.md)). The folder and its subfolders do not need
+to exist yet: downloading creates any that are missing, and
+`fjc_idb.create_folders('path/to/fjc_idb')` creates them without downloading
+anything.
 
 ## 3. Download the IDB files
 

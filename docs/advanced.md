@@ -29,6 +29,9 @@ for single years are used, not the cumulative, five- and ten-year, or
 twelve-months-ending-June files on the same pages, and bankruptcy data is not
 included.
 
+- **Folders.** Any folders of the data folder that do not exist yet are
+  created first, for every case type and the `docs` folder. Use
+  `fjc_idb.create_folders` to create them without downloading.
 - **Existing files.** A year is skipped if the data folder already has a file
   for it. With `overwrite`, the new file is downloaded first and then any older
   file for the year is removed, so a failed download never loses data.

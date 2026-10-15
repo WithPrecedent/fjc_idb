@@ -74,6 +74,31 @@ def test_download_overwrite(requests, tmp_path) -> None:
     assert [path.name for path in folder.iterdir()] == ['ap09_0.sas7bdat']
 
 
+def test_create_folders(tmp_path) -> None:
+    root = tmp_path / 'new' / 'fjc_idb'
+    folders = downloader.create_folders(root)
+    assert folders == [
+        root / 'appellate',
+        root / 'district' / 'civil',
+        root / 'district' / 'criminal',
+        root / 'docs',
+    ]
+    assert all(folder.is_dir() for folder in folders)
+    # Existing folders and files are left alone.
+    (root / 'appellate' / 'ap08.sas7bdat').write_text('existing')
+    downloader.create_folders(root)
+    assert (root / 'appellate' / 'ap08.sas7bdat').read_text() == 'existing'
+
+
+def test_download_creates_folders(requests, tmp_path) -> None:
+    root = tmp_path / 'new' / 'fjc_idb'
+    downloader.download('appellate', 2008, 2008, root, codebook = False)
+    assert (root / 'appellate' / 'ap08.sas7bdat').exists()
+    assert (root / 'district' / 'civil').is_dir()
+    assert (root / 'district' / 'criminal').is_dir()
+    assert (root / 'docs').is_dir()
+
+
 def test_download_invalid_case_type(tmp_path) -> None:
     with pytest.raises(ValueError):
         downloader.download('bankruptcy', 2008, 2009, tmp_path)
