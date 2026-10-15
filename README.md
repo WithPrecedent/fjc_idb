@@ -1,23 +1,23 @@
-# fjc idb
+# fjc-idb
 
 | | |
 | --- | --- |
 | Version | [![PyPI Latest Release](https://img.shields.io/pypi/v/fjc-idb.svg?style=for-the-badge&color=cornflowerblue&label=PyPI&logo=PyPI&logoColor=yellow)](https://pypi.org/project/fjc-idb/) [![GitHub Latest Release](https://img.shields.io/github/v/tag/WithPrecedent/fjc_idb?style=for-the-badge&color=forestgreen&label=GitHub&logo=github)](https://github.com/WithPrecedent/fjc_idb/releases) |
-| Status | [![Build Status](https://img.shields.io/github/actions/workflow/status/WithPrecedent/fjc_idb/ci.yml?branch=main&style=for-the-badge&color=cadetblue&label=Tests&logo=pytest)](https://github.com/WithPrecedent/fjc_idb/actions/workflows/ci.yml?query=branch%3Amain) [![Development Status](https://img.shields.io/badge/Development-Active-seagreen?style=for-the-badge&logo=git)](https://www.repostatus.org/#active) [![Project Stability](https://img.shields.io/pypi/status/fjc-idb?style=for-the-badge&logo=pypi&label=Stability&logoColor=yellow)](https://pypi.org/project/fjc_idb/) |
+| Status | [![Build Status](https://img.shields.io/github/actions/workflow/status/WithPrecedent/fjc_idb/ci.yml?branch=main&style=for-the-badge&color=cadetblue&label=Tests&logo=pytest)](https://github.com/WithPrecedent/fjc_idb/actions/workflows/ci.yml?query=branch%3Amain) [![Development Status](https://img.shields.io/badge/Development-Active-seagreen?style=for-the-badge&logo=git)](https://www.repostatus.org/#active) [![Project Stability](https://img.shields.io/pypi/status/fjc-idb?style=for-the-badge&logo=pypi&label=Stability&logoColor=yellow)](https://pypi.org/project/fjc-idb/) |
 | Documentation | [![Hosted By](https://img.shields.io/badge/Hosted_by-Github_Pages-blue?style=for-the-badge&color=forestgreen&logo=github)](https://WithPrecedent.github.io/fjc_idb) |
 | Tools | [![Documentation](https://img.shields.io/badge/MkDocs-magenta?style=for-the-badge&color=deepskyblue&logo=markdown&labelColor=gray)](https://squidfunk.github.io/mkdocs-material/) [![Linter](https://img.shields.io/endpoint?style=for-the-badge&url=https://raw.githubusercontent.com/charliermarsh/Ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/Ruff) [![Dependency Manager](https://img.shields.io/badge/uv-mediumpurple?style=for-the-badge&logo=uv&labelColor=gray)](https://docs.astral.sh/uv/) [![Pre-commit](https://img.shields.io/badge/pre--commit-darkolivegreen?style=for-the-badge&logo=pre-commit&logoColor=white&labelColor=gray)](https://github.com/TezRomacH/python-package-template/blob/master/.pre-commit-config.yaml) [![CI](https://img.shields.io/badge/GitHub_Actions-forestgreen?style=for-the-badge&logo=githubactions&labelColor=gray&logoColor=white)](https://github.com/features/actions) [![Editor Settings](https://img.shields.io/badge/Editor_Config-paleturquoise?style=for-the-badge&logo=editorconfig&labelColor=gray)](https://editorconfig.org/) [![Repository Template](https://img.shields.io/badge/snickerdoodle-bisque?style=for-the-badge&logo=cookiecutter&labelColor=gray)](https://www.github.com/WithPrecedent/snickerdoodle) [![Dependency Maintainer](https://img.shields.io/badge/dependabot-forestgreen?style=for-the-badge&logo=dependabot&logoColor=white&labelColor=gray)](https://github.com/dependabot) |
-| Compatibility | [![Compatible Python Versions](https://img.shields.io/pypi/pyversions/fjc-idb?style=for-the-badge&color=cornflowerblue&label=Python&logo=python&logoColor=yellow)](https://pypi.python.org/pypi/fjc_idb/) [![Linux](https://img.shields.io/badge/Linux-lightseagreen?style=for-the-badge&logo=linux&labelColor=gray&logoColor=white)](https://www.linux.org/) [![MacOS](https://img.shields.io/badge/MacOS-antiquewhite?style=for-the-badge&logo=apple&labelColor=gray)](https://www.apple.com/macos/)  [![Windows](https://img.shields.io/badge/Windows-blue?style=for-the-badge)](https://www.microsoft.com/en-us/windows?r=1) |
+| Compatibility | [![Compatible Python Versions](https://img.shields.io/pypi/pyversions/fjc-idb?style=for-the-badge&color=cornflowerblue&label=Python&logo=python&logoColor=yellow)](https://pypi.org/project/fjc-idb/) [![Linux](https://img.shields.io/badge/Linux-lightseagreen?style=for-the-badge&logo=linux&labelColor=gray&logoColor=white)](https://www.linux.org/) [![MacOS](https://img.shields.io/badge/MacOS-antiquewhite?style=for-the-badge&logo=apple&labelColor=gray)](https://www.apple.com/macos/)  [![Windows](https://img.shields.io/badge/Windows-blue?style=for-the-badge)](https://www.microsoft.com/en-us/windows?r=1) |
 | Stats | [![PyPI Download Rate (per month)](https://img.shields.io/pypi/dm/fjc-idb?style=for-the-badge&color=cornflowerblue&label=Downloads%20💾&logo=pypi&logoColor=yellow)](https://pypi.org/project/fjc-idb) [![GitHub Stars](https://img.shields.io/github/stars/WithPrecedent/fjc_idb?style=for-the-badge&color=forestgreen&label=Stars%20⭐&logo=github)](https://github.com/WithPrecedent/fjc_idb/stargazers) [![GitHub Contributors](https://img.shields.io/github/contributors/WithPrecedent/fjc_idb?style=for-the-badge&color=forestgreen&label=Contributors%20🙋&logo=github)](https://github.com/WithPrecedent/fjc_idb/graphs/contributors) [![GitHub Issues](https://img.shields.io/github/issues/WithPrecedent/fjc_idb?style=for-the-badge&color=forestgreen&label=Issues%20📘&logo=github)](https://github.com/WithPrecedent/fjc_idb/graphs/contributors) [![GitHub Forks](https://img.shields.io/github/forks/WithPrecedent/fjc_idb?style=for-the-badge&color=forestgreen&label=Forks%20🍴&logo=github)](https://github.com/WithPrecedent/fjc_idb/forks) |
 | | |
 
 -----
 
-## What is fjc idb?
+## What is fjc-idb?
 
-`fjc_idb` turns the Federal Judicial Center's [Integrated Database
+`fjc-idb` turns the Federal Judicial Center's [Integrated Database
 (IDB)](https://www.fjc.gov/research/idb) into clean CSV files.
 
-## Why use fjc idb?
+## Why use fjc-idb?
 
 - **Readable columns.** IDB field names such as `PROCPROG` become descriptive
   names such as `procedural_progress`, and codes become labels from the FJC
@@ -26,7 +26,7 @@
   1900-01-01) become real missing values, with the exceptions the codebooks
   describe (such as civil in forma pauperis status, where `-8` means "no").
 - **No double counting.** Each yearly file repeats every case still pending
-  when it was made. `fjc_idb` keeps pending cases only from the latest file, so
+  when it was made. `fjc-idb` keeps pending cases only from the latest file, so
   combining years does not count a case more than once.
 - **Useful added columns.** Indicators for appeal types and for groups of
   offenses and natures of suit, the days between key dates, counts of
@@ -43,7 +43,7 @@ it cannot cure the issue of missing data (particularly judge names). However,
 the improvements made here should make it easier to merge the IDB data with
 other sources (using the standard docket number format in `docket_number`).
 
-`fjc_idb` has
+`fjc-idb` has
 been tested on the files from 2008 through 2026. It does not yet support the
 bankruptcy files or the older files that use older codebooks.
 
@@ -58,10 +58,16 @@ bankruptcy files or the older files that use older codebooks.
 
 ### Installation
 
-To install `fjc idb`, use `pip`:
+To install `fjc-idb`, use `pip`:
 
 ```sh
-pip install fjc_idb
+pip install fjc-idb
+```
+
+The package is installed as `fjc-idb` and imported in Python as `fjc_idb`:
+
+```python
+import fjc_idb
 ```
 
 ### Usage
@@ -119,6 +125,7 @@ written as `NA`, and other missing values are left blank.
 | `--download` | off | Download missing files from the FJC website before exporting |
 | `--download-only` | off | Download missing files without exporting |
 | `--overwrite` | off | Replace files that were already downloaded |
+| `--merge-district` | off | Also merge the appellate data with the matching civil and criminal district records |
 
 See the [documentation](https://WithPrecedent.github.io/fjc_idb) for a
 tutorial, codebooks for each case type, and example analyses.

@@ -1,9 +1,9 @@
 # Civil District Codebook
 
-This codebook describes the civil CSV file that `fjc_idb` creates from the FJC
+This codebook describes the civil CSV file that `fjc-idb` creates from the FJC
 Integrated Database (IDB) files for civil cases in the U.S. district courts. It
 follows the FJC's *Civil Documentation* for 1988 forward (October 25, 2023),
-adapted to the column names, labels, and added columns that `fjc_idb`
+adapted to the column names, labels, and added columns that `fjc-idb`
 produces. The original codebook is available from the
 [FJC IDB page](https://www.fjc.gov/research/idb).
 
@@ -27,7 +27,7 @@ def table(codes, code_header = 'Code', label_header = 'Label'):
   year. The most recent files also hold a snapshot of cases still pending when
   the file was made.
 - **Pending cases.** A pending case is repeated in each file until it ends, so
-  `fjc_idb` keeps pending cases only from the latest file in the range. In
+  `fjc-idb` keeps pending cases only from the latest file in the range. In
   those rows, `pending` is 1 and `data_file_year` is 2099.
 - **Records are updated.** Each record reflects the case as of the latest
   update the FJC received, so information that changed during the case (such
@@ -38,13 +38,13 @@ def table(codes, code_header = 'Code', label_header = 'Label'):
 
 ## Conventions
 
-| Topic | How `fjc_idb` handles it |
+| Topic | How `fjc-idb` handles it |
 | --- | --- |
 | Column names | Each original IDB field is renamed to a descriptive name. Pass `rename_columns=False` (or `--rename-columns false`) to keep the IDB names, such as `PROCPROG`. |
 | Missing data | The IDB code `-8` and the date 1900-01-01 mean missing data. They are written as `NA` in date columns and left blank in all other columns, unless a column below says otherwise. |
 | Labels | Columns marked with a label table have their codes replaced by labels. Codes with no label are kept as they are. |
 | Indicators | Added indicator columns are `1` for yes and `0` for no. |
-| Added columns | Columns marked *added* are created by `fjc_idb` and are not in the IDB. |
+| Added columns | Columns marked *added* are created by `fjc-idb` and are not in the IDB. |
 
 ## Case identification
 
@@ -140,7 +140,7 @@ table({code: label for code, label in rules.circuits.items() if code != '-8'})
 
 ### Districts
 
-The IDB stores a two-character district code. `fjc_idb` adds the two-digit
+The IDB stores a two-character district code. `fjc-idb` adds the two-digit
 circuit in front of it (circuit 9 and district `73` become `0973`), which is
 how the appellate codebook lists districts.
 
@@ -174,7 +174,7 @@ Code `13` has been valid since July 1, 2016.
 ### Jurisdiction
 
 For prisoner petitions (nature of suit 510, 530, 535, 540, or 550), the codes
-have different meanings, which `fjc_idb` labels separately.
+have different meanings, which `fjc-idb` labels separately.
 
 | Code | Label (other cases) | Label (prisoner petitions) |
 | --- | --- | --- |

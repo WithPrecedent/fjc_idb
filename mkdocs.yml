@@ -2,7 +2,7 @@
 
 # Project Information
 
-site_name: fjc_idb
+site_name: fjc-idb
 site_description: Makes using the FJC Integrated Database easier
 site_url: https://WithPrecedent.github.io/fjc_idb
 repo_name: WithPrecedent/fjc_idb
@@ -158,4 +158,4 @@ extra:
   - icon: fontawesome/brands/github
     link: https://github.com/WithPrecedent
   - icon: fontawesome/brands/python
-    link: https://pypi.org/project/fjc_idb/
+    link: https://pypi.org/project/fjc-idb/

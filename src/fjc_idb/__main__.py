@@ -4,6 +4,7 @@ Examples:
     python -m fjc_idb appellate --start-year 2008 --stop-year 2026
     fjc-idb civil criminal --start-year 2020 --rename-columns false
     fjc-idb all --start-year 2008 --download
+    fjc-idb all --start-year 2008 --merge-district
 
 """
 
@@ -17,6 +18,7 @@ from collections.abc import Sequence
 from . import main as idb
 from . import options
 from .downloader import download as download_files
+from .merger import merge_district
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +60,16 @@ def main(arguments: Sequence[str] | None = None) -> None:
             fix_city_spellings = parsed.fix_city_spellings)
         logger.info(
             'Exported %s data in %.0fs.', case_type, time.time() - started)
+    if parsed.merge_district and not parsed.download_only:
+        started = time.time()
+        merge_district(
+            parsed.start_year,
+            parsed.stop_year,
+            data_folder = parsed.data_folder,
+            fix_city_spellings = parsed.fix_city_spellings)
+        logger.info(
+            'Merged appellate and district data in %.0fs.',
+            time.time() - started)
 
 
 def _get_parser() -> argparse.ArgumentParser:
@@ -125,6 +137,13 @@ def _get_parser() -> argparse.ArgumentParser:
         help = (
             'replace files that were already downloaded, such as the file for '
             'the current year, which the FJC updates during the year'))
+    parser.add_argument(
+        '--merge-district',
+        action = 'store_true',
+        help = (
+            'also merge the appellate data with the civil and criminal data '
+            'into fjc_idb_appellate_with_district_data_START_STOP.csv (needs '
+            'the files for all three case types)'))
     return parser
 
 

@@ -1,12 +1,12 @@
 # Recipes
 
-These examples use pandas to analyze the CSV files that `fjc_idb` creates.
+These examples use pandas to analyze the CSV files that `fjc-idb` creates.
 They assume the files were exported for 2008 through 2026 into the default data
 folder; change the paths to match your own files.
 
 ## Load a CSV file with the right types
 
-`fjc_idb` writes missing dates as `NA` and leaves other missing values blank.
+`fjc-idb` writes missing dates as `NA` and leaves other missing values blank.
 Because a few party names are literally "NA", read `NA` as missing only in date
 columns. The column specifications in `fjc_idb.base` say which columns are
 dates:
@@ -18,7 +18,7 @@ from fjc_idb import base, options
 
 
 def load_csv(path, case_type, columns = None):
-    """Loads an fjc_idb CSV file with missing data and dates parsed."""
+    """Loads an fjc-idb CSV file with missing data and dates parsed."""
     specs = getattr(base, f'{case_type}_columns').values()
     dates = [spec.name for spec in specs if spec.data_type == 'date']
     header = pd.read_csv(path, nrows = 0).columns
@@ -114,7 +114,7 @@ filings.groupby(fiscal_year).size().loc[2008:]
 ```
 
 The `count_*` columns (such as `count_filed`) describe the fiscal year of the
-file each record came from. Because `fjc_idb` keeps each defendant only from
+file each record came from. Because `fjc-idb` keeps each defendant only from
 the latest file that includes it, summing those columns by year undercounts
 defendants who were still pending at the end of an earlier year.
 

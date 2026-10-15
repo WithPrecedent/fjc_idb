@@ -1,10 +1,10 @@
 # Criminal District Codebook
 
-This codebook describes the criminal CSV file that `fjc_idb` creates from the
+This codebook describes the criminal CSV file that `fjc-idb` creates from the
 FJC Integrated Database (IDB) files for criminal defendants in the U.S.
 district courts. It follows the FJC's *Criminal Integrated Database (IDB): 1996
 to Present* codebook (August 2016), adapted to the column names, labels, and
-added columns that `fjc_idb` produces. The original codebook is available from
+added columns that `fjc-idb` produces. The original codebook is available from
 the [FJC IDB page](https://www.fjc.gov/research/idb).
 
 ```python exec="true" session="criminal"
@@ -30,7 +30,7 @@ def table(codes, code_header = 'Code', label_header = 'Label'):
   earlier information (such as the charges in a superseded indictment) can be
   overwritten.
 - **Pending defendants.** A pending defendant is repeated in every file until
-  terminated, so `fjc_idb` keeps pending defendants only from the latest file
+  terminated, so `fjc-idb` keeps pending defendants only from the latest file
   in the range. In those rows, `pending` is 1 and `data_file_year` is 2099.
   A defendant terminated in one year and terminated again in a later year
   (for example, after a retrial) has a row for each termination.
@@ -43,13 +43,13 @@ def table(codes, code_header = 'Code', label_header = 'Label'):
 
 ## Conventions
 
-| Topic | How `fjc_idb` handles it |
+| Topic | How `fjc-idb` handles it |
 | --- | --- |
 | Column names | Each original IDB field is renamed to a descriptive name. Pass `rename_columns=False` (or `--rename-columns false`) to keep the IDB names, such as `FOFFCD1`. |
 | Missing data | The IDB code `-8` and the date 1900-01-01 mean missing data. They are written as `NA` in date columns and left blank in all other columns. |
 | Labels | Columns marked with a label table have their codes replaced by labels. Codes with no label are kept as they are. |
 | Indicators | Added indicator columns are `1` for yes and `0` for no. |
-| Added columns | Columns marked *added* are created by `fjc_idb` and are not in the IDB. |
+| Added columns | Columns marked *added* are created by `fjc-idb` and are not in the IDB. |
 | Numbered columns | The IDB records up to five offenses for each defendant at filing and at termination, ranked by severity. Columns ending in `_1` through `_5` describe offense 1 (the most severe) through offense 5. |
 
 ## Defendant and case identification
@@ -198,7 +198,7 @@ table({code: label for code, label in rules.circuits.items() if code != '-8'})
 
 ### Districts
 
-The IDB stores a two-character district code. `fjc_idb` adds the two-digit
+The IDB stores a two-character district code. `fjc-idb` adds the two-digit
 circuit in front of it (circuit 9 and district `73` become `0973`), which is
 how the appellate codebook lists districts.
 
@@ -313,7 +313,7 @@ prejudice use code `15`.
 ### Sentence codes
 
 Prison months (`prison_months_N` and `prison_total_months`) are a number of
-months or one of these codes, which `fjc_idb` keeps as numbers:
+months or one of these codes, which `fjc-idb` keeps as numbers:
 
 | Code | Meaning |
 | --- | --- |

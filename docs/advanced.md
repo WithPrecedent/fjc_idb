@@ -17,6 +17,7 @@ fjc-idb CASE_TYPE [CASE_TYPE ...] --start-year YEAR [options]
 | `--download` | off | Download files missing from the data folder before exporting. |
 | `--download-only` | off | Download files missing from the data folder without exporting. |
 | `--overwrite` | off | With `--download` or `--download-only`, replace files that already exist. |
+| `--merge-district` | off | After exporting, merge the appellate data with the civil and criminal district data (see [Merging appellate and district data](#merging-appellate-and-district-data)). |
 
 The export options are arguments of `fjc_idb.run` and the functions in
 `fjc_idb.main`, and the download options are arguments of `fjc_idb.download`.
@@ -44,6 +45,58 @@ included.
 
 The dataset pages are listed in `options._DATASET_PAGES`. If the FJC moves a
 page, update its address there.
+
+## Merging appellate and district data
+
+`fjc_idb.merge_district` (or `--merge-district`) adds the district court's
+record of each appealed case to the appellate data and saves the result in the
+appellate folder as
+`fjc_idb_appellate_with_district_data_{start_year}_{stop_year}.csv`. It needs
+the appellate, civil, and criminal files for the same years.
+
+```python
+import fjc_idb
+
+merged = fjc_idb.merge_district(2008, 2026, data_folder = 'path/to/fjc_idb')
+```
+
+**How appeals are matched.**
+
+- An appeal is matched with the civil or criminal data according to its
+  appeal type (`rules.district_civil_appeal_types` and
+  `rules.district_criminal_appeal_types`). This matters because a district
+  can give a civil case and a criminal case the same docket number.
+- Civil appeals are matched by district and docket number. Criminal appeals
+  are matched by district, docket number, and defendant number; an appeal
+  without a defendant number is matched only if the docket has a single
+  defendant.
+- A reopened, remanded, or transferred case can have several district records
+  with the same docket number. The appeal is matched with the latest record
+  filed on or before the notice of appeal or, if none was, with the latest
+  record.
+- Administrative appeals, original proceedings, and appeals from bankruptcy
+  courts and bankruptcy appellate panels have no district record and are not
+  matched.
+
+**Columns.** The district columns are added with the prefix `district_`, such
+as `district_filing_date`, `district_disposition`, or `district_prison_total_months`.
+Columns that civil and criminal records share (such as the filing and
+termination dates) are combined into one column. Columns that only repeat the
+match keys or the appellate data are left out; they are listed in
+`rules.redundant_civil_columns` and `rules.redundant_criminal_columns`. The
+added `district_match` column is `civil` or `criminal` for a matched appeal and
+blank otherwise.
+
+**Coverage.** A district case is in the district files only if it was
+terminated in the range of years or was still pending, so appeals filed long
+after the start year match far more often than early ones. For 2008 through
+2026, 93% of civil appeals and 80% of criminal appeals were matched (98% and
+88% of those filed in 2010 or later). The merged data always uses the
+descriptive column names.
+
+The merge reads the civil and criminal files one year at a time and keeps only
+the records of appealed cases. For 2008 through 2026 it takes about as long as
+exporting all three case types.
 
 ## Changing the defaults
 
@@ -116,7 +169,7 @@ modules by case type:
 
 | Module | Contents |
 | --- | --- |
-| `rules.courts` | Circuits, districts, courthouses, city spelling fixes, and the date gaps added to every file |
+| `rules.courts` | Circuits, districts, courthouses, city spelling fixes, the date gaps added to every file, and the rules for merging appellate and district data |
 | `rules.appellate` | Appeal types, agencies, writs, publication, and other appellate labels |
 | `rules.offenses` | Groups of criminal offense codes, shared by the appellate and criminal files |
 | `rules.civil` | Groups of nature of suit codes, jurisdiction labels, and civil district labels |

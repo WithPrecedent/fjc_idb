@@ -1097,3 +1097,17 @@ date_gaps: dict[str, tuple[str, str]] = {
     'notice_to_judgment': ('APPDATE', 'JUDGDATE'),
     'notice_to_hearing': ('APPDATE', 'HEARDATE'),
     'filing_to_termination': ('FILEDATE', 'TERMDATE')}
+
+""" Merge Rules """
+
+# Appeal types (APPTYPE codes) of appeals from civil and criminal cases in the
+# district courts, which are matched with the civil and criminal files.
+district_civil_appeal_types: list[str] = ['3', '4', '12']
+district_criminal_appeal_types: list[str] = [
+    '13', '14', '15', '16', '17', '18', '19', '20', '21', '22']
+# District columns left out of merged data because they are the keys used to
+# match the records or the appellate data already has them.
+redundant_civil_columns: list[str] = [
+    'circuit', 'district', 'district_courthouse', 'docket']
+redundant_criminal_columns: list[str] = [
+    'circuit', 'district', 'district_courthouse', 'docket', 'defendant_number']

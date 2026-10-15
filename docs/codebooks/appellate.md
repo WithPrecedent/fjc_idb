@@ -1,9 +1,9 @@
 # Appellate Codebook
 
-This codebook describes the appellate CSV file that `fjc_idb` creates from the
+This codebook describes the appellate CSV file that `fjc-idb` creates from the
 FJC Integrated Database (IDB) files for the U.S. courts of appeals. It follows
 the FJC's *Appeals Documentation, FY 2008 – Present* (revised February 10,
-2021), adapted to the column names, labels, and added columns that `fjc_idb`
+2021), adapted to the column names, labels, and added columns that `fjc-idb`
 produces. The original codebook is available from the
 [FJC IDB page](https://www.fjc.gov/research/idb).
 
@@ -27,7 +27,7 @@ def table(codes, code_header = 'Code', label_header = 'Label'):
   2025). Each file holds the appeals terminated that year. The most recent
   files also hold a snapshot of appeals still pending when the file was made.
 - **Pending appeals.** A pending appeal is repeated in each file until it ends,
-  so `fjc_idb` keeps pending appeals only from the latest file in the range. In
+  so `fjc-idb` keeps pending appeals only from the latest file in the range. In
   those rows, `pending` is 1 and `data_file_year` is 2099.
 - **Column order.** The CSV keeps the order of the original file, with each
   added column placed next to the column it comes from. The tables below
@@ -35,14 +35,14 @@ def table(codes, code_header = 'Code', label_header = 'Label'):
 
 ## Conventions
 
-| Topic | How `fjc_idb` handles it |
+| Topic | How `fjc-idb` handles it |
 | --- | --- |
 | Column names | Each original IDB field is renamed to a descriptive name. Pass `rename_columns=False` (or `--rename-columns false`) to keep the IDB names, such as `CIRCUIT`. |
 | Missing data | The IDB code `-8` and the date 1900-01-01 mean missing data. They are written as `NA` in date columns and left blank in all other columns, unless a column below says otherwise. |
 | Not applicable | The IDB code `-9` means a field does not apply (for example, a nature of suit for a criminal appeal). It is kept as `-9` unless a column below says otherwise. |
 | Labels | Columns marked with a label table have their codes replaced by labels. Codes with no label are kept as they are. |
 | Indicators | Added indicator columns are `1` for yes and `0` for no. |
-| Added columns | Columns marked *added* are created by `fjc_idb` and are not in the IDB. |
+| Added columns | Columns marked *added* are created by `fjc-idb` and are not in the IDB. |
 
 ## Case identification
 
@@ -225,7 +225,7 @@ party names and circuits of the appeals that use them.
 
 ### Districts
 
-The IDB stores a two-character district code. `fjc_idb` adds the two-digit
+The IDB stores a two-character district code. `fjc-idb` adds the two-digit
 circuit in front of it (circuit 9 and district `73` become `0973`), which is
 how the codebook lists districts.
 
@@ -265,7 +265,7 @@ table(
 
 Jurisdiction is coded only for civil appeals. For prisoner petitions (nature of
 suit 510, 530, 535, 540, or 550), the codes have different meanings, which
-`fjc_idb` labels separately.
+`fjc-idb` labels separately.
 
 | Code | Label (other civil appeals) | Label (prisoner petitions) |
 | --- | --- | --- |

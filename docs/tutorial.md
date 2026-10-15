@@ -3,12 +3,18 @@
 This tutorial walks through downloading the FJC Integrated Database (IDB)
 files and turning them into clean CSV files.
 
-## 1. Install fjc_idb
+## 1. Install fjc-idb
 
-`fjc_idb` requires Python 3.11 or later.
+`fjc-idb` requires Python 3.11 or later.
 
 ```sh
-pip install fjc_idb
+pip install fjc-idb
+```
+
+The package is installed as `fjc-idb` and imported in Python as `fjc_idb`:
+
+```python
+import fjc_idb
 ```
 
 To work from a copy of the repository instead, install it with
@@ -20,7 +26,7 @@ uv sync
 
 ## 2. Choose a data folder
 
-`fjc_idb` keeps the IDB files, the FJC codebooks, and the CSV files it creates
+`fjc-idb` keeps the IDB files, the FJC codebooks, and the CSV files it creates
 in one data folder with this layout:
 
 ```text
@@ -47,9 +53,9 @@ anything.
 
 ## 3. Download the IDB files
 
-`fjc_idb` downloads the yearly SAS files from the
+`fjc-idb` downloads the yearly SAS files from the
 [FJC IDB page](https://www.fjc.gov/research/idb) and saves them in the data
-folder under their FJC names. It covers the three datasets that `fjc_idb`
+folder under their FJC names. It covers the three datasets that `fjc-idb`
 parses; bankruptcy data is not included.
 
 | Case type | FJC dataset | Years available |
@@ -118,6 +124,19 @@ Each case type is saved next to its yearly files, for example
 `appellate/fjc_idb_appellate_data_2008_2026.csv`. When no stop year is given,
 the current year is used. For 2008 through 2026, the appellate file takes about
 a minute, the civil file about five minutes, and the criminal file about seven.
+
+To add the district court record of each appealed case to the appellate data,
+add `--merge-district` (or call `fjc_idb.merge_district`). It needs the files
+for all three case types:
+
+```sh
+fjc-idb all --start-year 2008 --data-folder path/to/fjc_idb --merge-district
+```
+
+The merged data is saved as
+`appellate/fjc_idb_appellate_with_district_data_2008_2026.csv`. See the
+[Advanced User Guide](advanced.md#merging-appellate-and-district-data) for how
+appeals are matched.
 
 ## 5. Understand the output
 
