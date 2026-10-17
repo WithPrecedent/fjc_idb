@@ -142,4 +142,4 @@ for exploring the data.
 
 ## License
 
-Use of this repository is authorized under the [Apache Software License 2.0](https://www.github.com/WithPrecedent/fjc_idb/blog/main/LICENSE).
+Use of this repository is authorized under the [Apache Software License 2.0](https://www.github.com/WithPrecedent/fjc_idb/blob/main/LICENSE).
