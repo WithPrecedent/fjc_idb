@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 <!-- insertion marker -->
 
+## 0.0.4
+
+### Changed
+
+- Updated to the `snickerdoodle` 0.4.0 template.
+- Made `ruff` ignore boolean default positional arguments (`FBT002`).
+- Relaxed `pydoclint` checks of type hints, class attributes, and raised exceptions.
+- Excluded `uv.lock` from the large file check.
+- Fixed typos in the contributing guide and noted that the project does not use a code formatter.
+- Fixed the LICENSE link in the README.
+
 ## 0.0.3
 
 ### Added

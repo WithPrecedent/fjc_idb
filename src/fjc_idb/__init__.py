@@ -6,7 +6,7 @@ from .downloader import create_folders, download, list_files
 from .main import run
 from .merger import merge_district
 
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 
 __author__: str = 'Corey Rayburn Yung'
 
