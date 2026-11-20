@@ -289,6 +289,37 @@ def _add_appeal_type_columns(
         position += 1
     return data
 
+def _add_criminal_appeal_sides(data: pd.DataFrame) -> pd.DataFrame:
+    """Adds a column for each side that can bring a criminal appeal.
+
+    The new columns are named by `rules.criminal_appeal_sides` and placed after
+    APPTYPE. A column is 1 if the appeal type is in `rules.criminal_apptypes`
+    and USAPT has the column's code, and 0 otherwise. Both are missing where
+    APPTYPE is missing or where a criminal appeal has no USAPT code.
+
+    Args:
+        data: The imported appellate dataset.
+
+    Returns:
+        pd.DataFrame: The appellate dataset with the new columns.
+
+    """
+    if not all(source in data for source in ('APPTYPE', 'USAPT')):
+        return data
+    appeal_types = _to_codes(data['APPTYPE'])
+    us_appellant = _to_codes(data['USAPT'])
+    criminal = appeal_types.isin(rules.criminal_apptypes)
+    sides = list(rules.criminal_appeal_sides.values())
+    missing = (
+        appeal_types.isna() | appeal_types.isin(options._MISSING_CODES)
+        | (criminal & ~us_appellant.isin(sides)))
+    position = _position_after(data, 'APPTYPE')
+    for name, code in rules.criminal_appeal_sides.items():
+        indicator = (criminal & us_appellant.isin([code])).astype('Int64')
+        data.insert(position, name, indicator.mask(missing))
+        position += 1
+    return data
+
 def _add_code_columns(
     data: pd.DataFrame,
     sources: str | list[str],
@@ -408,32 +439,36 @@ def _add_published(data: pd.DataFrame) -> pd.DataFrame:
 
 def _add_pro_se_party(
     data: pd.DataFrame,
-    sources: tuple[str, ...] = ('PROSEFLE', 'PROSETRM')) -> pd.DataFrame:
-    """Adds a column showing whether any party was pro se.
+    sources: tuple[str, ...] = ('PROSEFLE', 'PROSETRM'),
+    name: str = 'pro_se_party',
+    included: list[str] | None = None) -> pd.DataFrame:
+    """Adds a column showing whether a party was pro se.
 
-    The new 'pro_se_party' column is placed after the last of `sources`. It is
-    1 if any of `sources` shows a pro se party, 0 if none of them does, and
-    missing if all of them are missing.
+    The new column is placed after the last of `sources`. It is 1 if any of
+    `sources` has a code in `included`, 0 if none of them does but at least
+    one has a known pro se code, and missing otherwise.
 
     Args:
         data: The imported dataset.
         sources: The columns with pro se codes. Defaults to the appellate
             columns for pro se parties at filing and at termination.
+        name: The name of the new column. Defaults to 'pro_se_party'.
+        included: The pro se codes marked as 1. Defaults to None, in which
+            case `rules.pro_se_codes` (any party pro se) is used.
 
     Returns:
-        pd.DataFrame: The dataset with the 'pro_se_party' column.
+        pd.DataFrame: The dataset with the new column.
 
     """
     if not all(source in data for source in sources):
         return data
+    included = rules.pro_se_codes if included is None else included
     codes = pd.concat([_to_codes(data[source]) for source in sources], axis = 1)
     known = ['0', *rules.pro_se_codes]
-    pro_se_party = pd.Series(pd.NA, index = data.index, dtype = 'Int64')
-    pro_se_party = pro_se_party.mask(codes.isin(known).any(axis = 1), 0)
-    pro_se_party = pro_se_party.mask(
-        codes.isin(rules.pro_se_codes).any(axis = 1), 1)
-    data.insert(
-        _position_after(data, sources[-1]), 'pro_se_party', pro_se_party)
+    pro_se = pd.Series(pd.NA, index = data.index, dtype = 'Int64')
+    pro_se = pro_se.mask(codes.isin(known).any(axis = 1), 0)
+    pro_se = pro_se.mask(codes.isin(included).any(axis = 1), 1)
+    data.insert(_position_after(data, sources[-1]), name, pro_se)
     return data
 
 def _combine_court_codes(
@@ -675,9 +710,11 @@ def _prepare_appellate(data: pd.DataFrame) -> pd.DataFrame:
     """Makes the changes that are specific to appellate data.
 
     Indicator columns for each appeal type at filing and at termination, for
-    groups of criminal offenses and natures of suit, for whether any party was
-    pro se, for whether the decision was published, and for the number of
-    concurrences and dissents are added, a standard
+    which side brought a criminal appeal, for groups of criminal offenses and
+    natures of suit, for prisoner appeals, for whether the appellant or any
+    party was pro se, for the outcome of appeals decided on the merits, for
+    whether the decision was published, and for the number of concurrences
+    and dissents are added, a standard
     hyphenated docket number is added, the district of origin is prefixed
     with its circuit, which is how district codes are listed in the FJC
     codebook, and the district office is prefixed with that district code,
@@ -690,11 +727,20 @@ def _prepare_appellate(data: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame: The appellate dataset ready for parsing.
 
     """
+    # The appeal type columns are inserted right after APPTYPE, so they come
+    # before the criminal side columns added first.
+    data = _add_criminal_appeal_sides(data)
     data = _add_appeal_type_columns(data)
     data = _add_appeal_type_columns(data, 'TRMTYPE', '_at_termination')
+    data = _add_pro_se_party(
+        data, name = 'pro_se_appellant',
+        included = rules.pro_se_appellant_codes)
     data = _add_pro_se_party(data)
+    data = _add_code_columns(data, 'OUTCOME', rules.disposition_columns)
     data = _add_published(data)
     data = _add_separate_opinions(data)
+    data = _add_code_columns(
+        data, 'NOS', {'prisoner_appeal': rules.prisoner_codes})
     data = _add_code_columns(data, 'OFFENSE', rules.criminal_offense_columns)
     data = _add_code_columns(data, 'NOS', rules.civil_nature_of_suit_columns)
     dockets = data['DOCKET'].map(parse_docket_number)

@@ -8,6 +8,7 @@ import pytest
 from fjc_idb import __main__ as cli
 from fjc_idb import options
 from fjc_idb.main import (
+    _add_criminal_appeal_sides,
     _add_pro_se_party,
     _add_separate_opinions,
     _drop_stale_pending,
@@ -92,6 +93,66 @@ def test_add_pro_se_party() -> None:
     assert parsed['pro_se_party'].tolist()[:5] == [1, 1, 0, 0, 1]
     assert pd.isna(parsed['pro_se_party'][5])
     assert list(parsed.columns) == ['PROSEFLE', 'PROSETRM', 'pro_se_party']
+
+
+def test_add_pro_se_appellant() -> None:
+    data = pd.DataFrame(
+        {
+            'PROSEFLE': ['1', '0', '2', '0', '-8'],
+            'PROSETRM': ['0', '3', '2', '0', '-8'],
+        }
+    )
+    parsed = _add_pro_se_party(
+        data, name='pro_se_appellant', included=['1', '3'])
+    assert parsed['pro_se_appellant'].tolist()[:4] == [1, 1, 0, 0]
+    assert pd.isna(parsed['pro_se_appellant'][4])
+
+
+def test_add_criminal_appeal_sides() -> None:
+    data = pd.DataFrame(
+        {
+            'USAPT': [0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, -8.0],
+            'APPTYPE': [19.0, 19.0, 21.0, 22.0, 4.0, 3.0, -8.0, 20.0],
+        }
+    )
+    parsed = _add_criminal_appeal_sides(data)
+    assert list(parsed.columns) == [
+        'USAPT',
+        'APPTYPE',
+        'criminal_defendant_appeal',
+        'criminal_government_appeal',
+    ]
+    defendant = parsed['criminal_defendant_appeal']
+    government = parsed['criminal_government_appeal']
+    assert defendant.tolist()[:6] == [1, 0, 1, 0, 0, 0]
+    assert government.tolist()[:6] == [0, 1, 0, 1, 0, 0]
+    assert defendant[6:].isna().all()
+    assert government[6:].isna().all()
+
+
+def test_appellate_logical_columns() -> None:
+    raw = _raw_appellate().assign(
+        USAPT=[1.0, 0.0],
+        PROSEFLE=[0.0, 1.0],
+        PROSETRM=['0', '-8'],
+        OUTCOME=[3.0, -8.0],
+    )
+    data = parse_data(raw, 'appellate')
+    assert data['criminal_government_appeal'].tolist() == [1, 0]
+    assert data['criminal_defendant_appeal'].tolist() == [0, 0]
+    assert data['pro_se_appellant'].tolist() == [0, 1]
+    assert data['prisoner_appeal'].tolist() == [1, 0]
+    assert data['affirmed'][0] == 0
+    assert data['affirmed_in_part'][0] == 1
+    assert data['reversed_in_whole_or_part'][0] == 1
+    assert data[['affirmed', 'reversed']].iloc[1].isna().all()
+    columns = list(data.columns)
+    assert columns.index('criminal_defendant_appeal') > columns.index(
+        'criminal_miscellaneous'
+    )
+    assert columns.index('pro_se_party') + 1 == columns.index(
+        'pro_se_appellant'
+    )
 
 
 def test_add_separate_opinions() -> None:

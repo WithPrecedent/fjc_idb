@@ -64,11 +64,12 @@ def table(codes, code_header = 'Code', label_header = 'Label'):
 | --- | --- | --- | --- |
 | `us_appellant` | USAPT | integer | `1` if the United States initiated the appeal and `0` if not. |
 | `appellant` | APPELLAN | text | Name of the party who initiated the appeal (truncated to 20 characters). |
-| `us_appellee` | USAPE | integer | `1` if the appeal was filed against the United States and `0` if not. |
+| `us_appellee` | USAPE | integer | `1` if the appeal was filed against the United States and `0` if not. Rarely coded: it is `0` for every appeal in the 2015 through 2024 files, so it does not reliably show that the United States was the appellee. |
 | `appellee` | APPELLEE | text | Name of the party against whom the appeal was taken (truncated to 20 characters). |
 | `pro_se_at_filing` | PROSEFLE | integer | Pro se parties at filing. See [Pro se parties](#pro-se-parties). |
 | `pro_se_at_termination` | PROSETRM | text | Pro se parties at termination. See [Pro se parties](#pro-se-parties). |
 | `pro_se_party` | PROSEFLE, PROSETRM | integer | *Added.* `1` if either column shows a pro se party (codes 1, 2, or 3), `0` if neither does, and blank if both are missing. |
+| `pro_se_appellant` | PROSEFLE, PROSETRM | integer | *Added.* `1` if either column shows a pro se appellant (codes 1 or 3), `0` if neither does, and blank if both are missing. |
 | `in_forma_pauperis` | FILEFEE | integer | `1` if a party was granted permission to proceed in forma pauperis at filing (`FP`). The IDB stores `-8` for all other appeals, which is left blank. |
 | `in_forma_pauperis_termination` | TRMFEE | text | In forma pauperis status at termination: `1` if granted (`FP`), `0` if not (`N`), and `Missing/Pending` for `-8`, which appears only on pending appeals. |
 
@@ -80,6 +81,8 @@ def table(codes, code_header = 'Code', label_header = 'Label'):
 | *appeal type indicators* | APPTYPE | integer | *Added.* One column for each appeal type, named in [Appeal types](#appeal-types). |
 | `appeal_type_termination` | TRMTYPE | text | Type of appeal as reported by the clerk at termination, using the same codes as `appeal_type`. It differs from `appeal_type` in about 0.07% of terminated appeals, almost all in 2008–2010 and among the sentencing guideline codes. It is `-8` for pending appeals. |
 | *appeal type indicators at termination* | TRMTYPE | integer | *Added.* The same indicator columns built from `appeal_type_termination`, each with `_at_termination` added to its name. For pending appeals, only `appeal_type_missing_at_termination` is 1. |
+| `criminal_defendant_appeal` | APPTYPE, USAPT | integer | *Added.* `1` for a criminal appeal (`appeal_type` 13–22, including post-conviction and miscellaneous criminal appeals) that the United States did not initiate (`us_appellant` is 0), so the defendant or another private party is the appellant. `0` for all other appeals, and blank if `appeal_type` is missing. |
+| `criminal_government_appeal` | APPTYPE, USAPT | integer | *Added.* `1` for a criminal appeal (`appeal_type` 13–22) that the United States initiated (`us_appellant` is 1). `0` for all other appeals, and blank if `appeal_type` is missing. |
 | `writ` | ORGPROC | integer | Nature of an original proceeding (coded only when `appeal_type` is 6). See [Writs](#writs) for the codes. |
 | `writ_termination` | TORPROCSUB | text | Nature of an original proceeding as reported at termination. See [Writs](#writs). |
 | `agency` | AGENCY | text | Federal agency involved in an administrative appeal (coded only when `appeal_type` is 1 or 2). See [Agencies](#agencies). Non-agency appeals (IDB code `-9`) are labeled `None`. |
@@ -98,6 +101,7 @@ def table(codes, code_header = 'Code', label_header = 'Label'):
 | `jurisdiction` | JURIS | text | Basis of federal jurisdiction in civil appeals. See [Jurisdiction](#jurisdiction). |
 | `nature_of_suit` | NOS | integer | Nature of the action in civil appeals. See [Nature of suit](#nature-of-suit). `-9` for non-civil appeals. |
 | *nature of suit indicators* | NOS | integer | *Added.* One column for each group of nature of suit codes. See [Nature of suit groups](#nature-of-suit-groups). |
+| `prisoner_appeal` | NOS | integer | *Added.* `1` for a prisoner petition (nature of suit 510, 530, 535, 540, or 550), `0` for any other nature of suit or a non-civil appeal (`-9`), and blank if the nature of suit is missing. Post-conviction criminal appeals (`appeal_type` 21) have no nature of suit and are `0`. |
 | `criminal_offense` | OFFENSE | integer | Offense charged in criminal appeals. Codes are stored as numbers, so leading zeros are dropped (`0100` becomes `100`). See [Criminal offenses](#criminal-offenses). `-9` for non-criminal appeals. |
 | *offense indicators* | OFFENSE | integer | *Added.* One column for each group of offense codes. See [Offense groups](#offense-groups). Blank when the offense is missing. |
 | `criminal_defendant_number` | DDEFNUM | text | Defendant number in the district court for criminal cases. |
@@ -109,6 +113,7 @@ def table(codes, code_header = 'Code', label_header = 'Label'):
 | --- | --- | --- | --- |
 | `when_terminated` | DISP | text | How the appeal was terminated. See [Termination codes](#termination-codes). |
 | `disposition` | OUTCOME | text | Outcome of an appeal decided on the merits (`when_terminated` 1, 2, or 3). See [Termination codes](#termination-codes). |
+| *outcome indicators* | OUTCOME | integer | *Added.* `affirmed` (code 1), `reversed` (2, reversed or vacated), `affirmed_in_part` (3), `reversed_in_whole_or_part` (2 or 3), `dismissed_on_merits` (5), and `remanded_only` (6). Blank when `disposition` is missing, which includes every appeal that was not decided on the merits and every pending appeal, so the mean of a column is its rate among merits decisions. |
 | `procedural_termination` | PROCTERM | integer | Type of procedural termination after judicial action (`when_terminated` 4). See [Termination codes](#termination-codes). |
 | `non_merits_disposition` | METHOD | text | Type of termination by the clerk without judicial action (`when_terminated` 5). See [Termination codes](#termination-codes). |
 | `original_proceeding_termination` | OPDISP | text | Outcome of an original proceeding: `1` granted, `2` denied, `3` dismissed or other. |

@@ -28,9 +28,11 @@
 - **No double counting.** Each yearly file repeats every case still pending
   when it was made. `fjc-idb` keeps pending cases only from the latest file, so
   combining years does not count a case more than once.
-- **Useful added columns.** Indicators for appeal types and for groups of
-  offenses and natures of suit, the days between key dates, counts of
-  concurrences and dissents, a standard appellate docket number, and more.
+- **Useful added columns.** Indicators for appeal types, for groups of
+  offenses and natures of suit, for whether the defendant or the government
+  brought a criminal appeal, and for appeal outcomes, the days between key
+  dates, counts of concurrences and dissents, a standard appellate docket
+  number, and more.
 - **Large files, little memory.** Years are processed one at a time, so even
   the criminal files (144 columns) need only a gigabyte or two of memory.
 - **Codebooks for the output.** The documentation includes codebooks that

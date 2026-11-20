@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 <!-- insertion marker -->
 
+## 0.1.0
+
+### Added
+
+- Appellate indicator columns `criminal_defendant_appeal` and
+  `criminal_government_appeal`, which show whether a criminal appeal
+  (`appeal_type` 13 through 22) was brought by a private party or by the
+  United States (from `us_appellant`).
+- Appellate indicator columns `pro_se_appellant` (the appellant was pro se),
+  `prisoner_appeal` (a prisoner petition nature of suit), and `affirmed`,
+  `reversed`, `affirmed_in_part`, `reversed_in_whole_or_part`,
+  `dismissed_on_merits`, and `remanded_only` (from `disposition`, blank for
+  appeals not decided on the merits).
+
+### Changed
+
+- `rules.criminal_apptypes` now holds text codes and includes miscellaneous
+  criminal appeals (code 22), matching `rules.district_criminal_appeal_types`.
+- The appellate codebook notes that `us_appellee` is not reliably coded.
+
 ## 0.0.4
 
 ### Changed

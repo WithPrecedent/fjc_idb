@@ -9,7 +9,10 @@ unpublished_codes: list[int] = [1, 3, 5, 7]
 
 """ Appellate Rules """
 
-criminal_apptypes: list[int] = [13, 14, 15, 16, 17, 18, 19, 20, 21]
+# APPTYPE codes of criminal appeals, including post-conviction (21) and
+# miscellaneous criminal (22) appeals.
+criminal_apptypes: list[str] = [
+    '13', '14', '15', '16', '17', '18', '19', '20', '21', '22']
 sentencing_apptypes: list[int] = [13, 14, 15, 16, 17]
 civil_apptypes: list[int] = [1, 2, 3, 5, 10, 11, 12]
 bankruptcy_apptypes: list[int] = [10, 11, 12]
@@ -33,12 +36,28 @@ appeal_types_to_columns: dict[str, str] = {
     '21': 'criminal_post_conviction',
     '22': 'criminal_miscellaneous',
     '-8': 'appeal_type_missing'}
-# Appeal types that are marked in the columns of more than one other type.
+# USAPT codes marked in the columns for which side brought a criminal appeal.
+criminal_appeal_sides: dict[str, str] = {
+    'criminal_defendant_appeal': '0',
+    'criminal_government_appeal': '1'}
+# OUTCOME codes marked in the columns for the outcome of an appeal decided on
+# the merits.
+disposition_columns: dict[str, list[str]] = {
+    'affirmed': ['1'],
+    'reversed': ['2'],
+    'affirmed_in_part': ['3'],
+    'reversed_in_whole_or_part': ['2', '3'],
+    'dismissed_on_merits': ['5'],
+    'remanded_only': ['6']}
 # PROSEFLE and PROSETRM codes for an appellant, an appellee, or both pro se.
 pro_se_codes: list[str] = ['1', '2', '3']
+# PROSEFLE and PROSETRM codes for an appellant pro se, alone or with the
+# appellee.
+pro_se_appellant_codes: list[str] = ['1', '3']
 # JDG1INV, JDG2INV, and JDG3INV codes for judges who wrote separate opinions.
 concurrence_codes: list[str] = ['B', 'D', 'E', 'G']
 dissent_codes: list[str] = ['C', 'F', 'G']
+# Appeal types that are marked in the columns of more than one other type.
 appeal_types_in_other_columns: dict[str, list[str]] = {
     '17': ['15', '16']}
 capital_case: dict[str, str] = {
